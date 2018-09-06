@@ -305,8 +305,7 @@ void load_program() {
 /************************************************************/
 void handle_instruction()
 {
-	/*IMPLEMENT THIS*/
-	/* execute one instruction at a time. Use/update CURRENT_STATE and and NEXT_STATE, as necessary.*/
+	
 }
 
 
@@ -342,93 +341,157 @@ void print_instruction(uint32_t addr){
 
 	char string[64];
 	
-	uint32_t instruction = mem_read32(addr);
+	uint32_t instruction = mem_read_32(addr);
 	
 	uint32_t op = instruction & 0xFC000000; //opcode
 	uint32_t bk = instruction & 0x0000003F; //back of 32 bits to id the op code
-	uint32_t rs = instruction & 0x03E00000; //source
-	uint32_t rt = instruction & 0x001F0000; //destination
-	uint16_t im = instruction & 0x0000FFFF; //immediate
-	uint32_t tr = instruction & 0x03FFFFFF; //target
-	uint32_t rd = instruction & 0x00003C00; //reg destination (register)
-	uint32_t sh = instruction & 0x000007C0; //shift amount
+	uint8_t rs = (instruction & 0x03E00000) >> 21; //source
+	uint8_t rt = (instruction & 0x001F0000) >> 16; //destination
+	uint16_t im = instruction & 0x0000FFFF; //immediate / offset
+	uint8_t rd = (instruction & 0x00003C00) >> 11; //reg destination (register)
 	switch(op) {
 		case 0x00000000: //ADD, ADDU, AND, NOR, OR, SLT, SUB, SUBU, XOR, SLL, SRL, DIV, DIVU, MULT, MULTU, SRA, MFHI, MFLO, MTHI, MTLO, JR, JALR
 			switch(bk) {
-				case 0x00000020; //ADD
-					sprintf(string, "ADD %d, %d, %d\n", rd, rs, rt);
+				case 0x00000020: //ADD
+					sprintf(string, "ADD $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000021; //ADDU
-					sprintf(string, "ADDU %d, %d, %d\n", rd, rs, rt);
+				case 0x00000021: //ADDU
+					sprintf(string, "ADDU $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000023; //AND
-					sprintf(string, "AND %d, %d, %d\n", rd, rs, rt);
+				case 0x00000024: //AND
+					sprintf(string, "AND $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000027; //NOR
-					sprintf(string, "NOR %d, %d, %d\n", rd, rs, rt);
+				case 0x00000027: //NOR
+					sprintf(string, "NOR $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000025; //OR
-					sprintf(string, "OR %d, %d, %d\n", rd, rs, rt);
+				case 0x00000025: //OR
+					sprintf(string, "OR $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x0000002A; //SLT
-					sprintf(string, "SLT %d, %d, %d\n", rd, rs, rt);
+				case 0x0000002A: //SLT
+					sprintf(string, "SLT $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000022; //SUB
-					sprintf(string, "SUB %d, %d, %d\n", rd, rs, rt);
+				case 0x00000022: //SUB
+					sprintf(string, "SUB $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000023; //SUBU
-					sprintf(string, "SUBU %d, %d, %d\n", rd, rs, rt);
+				case 0x00000023: //SUBU
+					sprintf(string, "SUBU $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000026; //XOR
-					sprintf(string, "XOR %d, %d, %d\n", rd, rs, rt);
+				case 0x00000026: //XOR
+					sprintf(string, "XOR $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000000; //SLL
-					sprintf(string, "SLL %d, %d, %d\n", rd, rs, rt);
+				case 0x00000000: //SLL
+					sprintf(string, "SLL $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000002; //SRL
-					sprintf(string, "SRL %d, %d, %d\n", rd, rs, rt);
+				case 0x00000002: //SRL
+					sprintf(string, "SRL $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x0000001A; //DIV
-					sprintf(string, "DIV %d, %d, %d\n", rd, rs, rt);
+				case 0x0000001A: //DIV
+					sprintf(string, "DIV $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x0000001B; //DIVU
-					sprintf(string, "DIVU %d, %d, %d\n", rd, rs, rt);
+				case 0x0000001B: //DIVU
+					sprintf(string, "DIVU $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000018; //MULT
-					sprintf(string, "MULT %d, %d, %d\n", rd, rs, rt);
+				case 0x00000018: //MULT
+					sprintf(string, "MULT $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000019; //MULTU
-					sprintf(string, "MULTU %d, %d, %d\n", rd, rs, rt);
+				case 0x00000019: //MULTU
+					sprintf(string, "MULTU $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000003; //SRA
-					sprintf(string, "SRA %d, %d, %d\n", rd, rs, rt);
+				case 0x00000003: //SRA
+					sprintf(string, "SRA $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000010; //MFHI
-					sprintf(string, "MFHI %d, %d, %d\n", rd, rs, rt);
+				case 0x00000010: //MFHI
+					sprintf(string, "MFHI $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000012; //MFLO
-					sprintf(string, "MFLO %d, %d, %d\n", rd, rs, rt);
+				case 0x00000012: //MFLO
+					sprintf(string, "MFLO $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000011; //MTHI
-					sprintf(string, "MTHI %d, %d, %d\n", rd, rs, rt);
+				case 0x00000011: //MTHI
+					sprintf(string, "MTHI $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000013; //MTLO
-					sprintf(string, "MTLO %d, %d, %d\n", rd, rs, rt);
+				case 0x00000013: //MTLO
+					sprintf(string, "MTLO $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000008; //JR
-					sprintf(string, "JR %d, %d, %d\n", rd, rs, rt);
+				case 0x00000008: //JR
+					sprintf(string, "JR $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x00000009; //JALR
-					sprintf(string, "JALR %d, %d, %d\n", rd, rs, rt);
+				case 0x00000009: //JALR
+					sprintf(string, "JALR $%d, $%d, $%d\n", rd, rs, rt);
 					break;
-				case 0x0000000C; //SYSTEM CALL
-					sprintf(string, "SYSTEMCALL");
+				case 0x0000000C: //SYSTEM CALL
+					sprintf(string, "SYSTEMCALL\n");
 					break;
 			}
 			break;
-		case 0x		
+		case 0x04000000:
+			switch(rt) {
+				case 0x00000000:
+					sprintf(string, "BLTZ $%d, $%x\n", rt, im);
+					break;
+				case 0x00000008:
+					sprintf(string, "BGEZ $%d, $%x\n", rs, im);
+					break;
+			}
+			break;
+		case 0x20000000:
+			sprintf(string, "ADDI $%d, $%d, $%d\n", rt, rs, im);
+			break;
+		case 0x24000000:
+			sprintf(string, "ADDIU $%d, $%d, $%d\n", rt, rs, im);
+			break;
+		case 0x30000000:
+			sprintf(string, "ANDI $%d, $%d, $%d\n", rt, rs, im);
+			break;
+		case 0x34000000:
+			sprintf(string, "ORI $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0x28000000:
+			sprintf(string, "SLTI $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0x38000000:
+			sprintf(string, "XORI $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0x10000000:
+			sprintf(string, "BEQ $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0x14000000:
+			sprintf(string, "BNE $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0x18000000:
+			sprintf(string, "BLEZ $%d, $0x00, $%d\n", rs, im);
+			break;
+		case 0x1C000000:
+			sprintf(string, "BGTZ $%d, $0x00, $%d\n", rs, im);
+			break;
+		case 0x08000000:
+			sprintf(string, "J %u\n", instruction & 0x03FFFFFF);
+		 	break;
+		case 0x0C000000:
+			sprintf(string, "JAL %u\n", instruction & 0x03FFFFFF);
+			break;
+		case 0x80000000:
+			sprintf(string, "LB $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0x84000000:
+			sprintf(string, "LH $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0x8C000000:
+			sprintf(string, "LW $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0xD0000000:
+			sprintf(string, "SB $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0xD4000000:
+			sprintf(string, "SH $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0xDC000000:
+			sprintf(string, "SW $%d, $%d, $%d\n", rs, rt, im);
+			break;
+		case 0x3C000000:
+			sprintf(string, "LUI $%d, $%d\n", rt, im);
+			break;
 	}
-	
+	printf("%s", string);
 }
 
 /***************************************************************
