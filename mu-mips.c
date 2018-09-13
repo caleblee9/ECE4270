@@ -400,7 +400,9 @@ void handle_instruction()
 					NEXT_STATE.PC = CURRENT_STATE.REGS[rs];
 					break;
 				case 0x0000000C: //SYSTEM CALL
-					NEXT_STATE.REGS[2] = 0xA;
+					if(CURRENT_STATE.REGS[2] == 0xA) {
+						RUN_FLAG = FALSE;
+					}
 					printf("SYSTEM CALL\n");	
 					break;
 			}
@@ -500,7 +502,7 @@ void handle_instruction()
 		case 0xA4000000: //SH
 			{
 				uint16_t temp = CURRENT_STATE.REGS[rs] + im;
-				temp = CURRENT_STATE.REGS[rt];
+				temp = (uint16_t) CURRENT_STATE.REGS[rt];
 			}
 			break;
 		case 0xAC000000: //SW
