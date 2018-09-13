@@ -352,10 +352,10 @@ void handle_instruction()
 
 					break;
 				case 0x00000000: //SLL
-					NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] << h;
+					NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] << h;
 					break;
 				case 0x00000002: //SRL
-					NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] >> h;
+					NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] >> h;
 
 					break;
 				case 0x0000001A: //DIV
@@ -376,7 +376,7 @@ void handle_instruction()
 					NEXT_STATE.HI = (CURRENT_STATE.REGS[rs] * CURRENT_STATE.REGS[rt]) & 0xFFFFFFFF00000000 >> 32;
 					break;
 				case 0x00000003: //SRA
-					NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] >> h;
+					NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] >> h;
 					break;
 				case 0x00000010: //MFHI
 					NEXT_STATE.REGS[rd] = CURRENT_STATE.HI;
@@ -484,31 +484,41 @@ void handle_instruction()
 			break; 
 			}
 		case 0x80000000: //LB
-			NEXT_STATE.REGS[rt] = (uint8_t) (CURRENT_STATE.REGS[rs] + im);
+			{
+				uint32_t temp = CURRENT_STATE.REGS[rs] + im;
+				NEXT_STATE.REGS[rt] = temp;
+				
+			}
 			break;
 		case 0x84000000: //LH
-			NEXT_STATE.REGS[rt] = (uint16_t) (CURRENT_STATE.REGS[rs] + im);
+			{
+				uint32_t temp = CURRENT_STATE.REGS[rs] + im;
+			}
 			break;
 		case 0x8C000000: //LW
-			NEXT_STATE.REGS[rt] = (uint32_t) (CURRENT_STATE.REGS[rs] + im);
+			{
+				uint32_t temp = CURRENT_STATE.REGS[rs] + im;
+				NEXT_STATE.REGS[rt] = mem_read_32(temp);
+			}
 			break;
 		case 0xA0000000: //SB
 			{
-				uint16_t temp = CURRENT_STATE.REGS[rs] + im;
-				temp = (uint8_t) CURRENT_STATE.REGS[rt];
+				uint32_t temp = CURRENT_STATE.REGS[rs] + im;
+				mem_write_32(temp, (uint32_t) CURRENT_STATE.REGS[rt]); 
 				
 			}
 			break;
 		case 0xA4000000: //SH
 			{
-				uint16_t temp = CURRENT_STATE.REGS[rs] + im;
-				temp = (uint16_t) CURRENT_STATE.REGS[rt];
+				uint32_t temp = CURRENT_STATE.REGS[rs] + im;
+				mem_write_32(temp, (uint32_t) CURRENT_STATE.REGS[rt]); 
 			}
 			break;
 		case 0xAC000000: //SW
 			{
-				uint16_t temp = CURRENT_STATE.REGS[rs] + im;
-				temp = (uint32_t) CURRENT_STATE.REGS[rt];
+				uint32_t temp = CURRENT_STATE.REGS[rs] + im;
+				mem_write_32(temp, (uint32_t) CURRENT_STATE.REGS[rt]); 
+				
 			}
 
 			break;
